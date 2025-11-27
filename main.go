@@ -1,22 +1,43 @@
 package main
 
 import (
-    "net/http"
+	"log"
+	"net/http"
+	"sync/atomic"
 )
 
+type apiConfig struct {
+	fileserverHits atomic.Int32
+}
+
 func main() {
-    mux := http.NewServeMux()
+	const filepathRoot = "."
+	const port = "8080"
 
-    // Step 1: readiness endpoint
-    mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
-        w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-        w.WriteHeader(http.StatusOK)
-        w.Write([]byte("OK"))
-    })
+	apiCfg := apiConfig{
+		fileserverHits: atomic.Int32{},
+	}
 
-    // Step 2: fileserver at /app/
-    fileServer := http.FileServer(http.Dir("."))
-    mux.Handle("/app/", http.StripPrefix("/app/", fileServer))
+	mux := http.NewServeMux()
 
-    http.ListenAndServe(":8080", mux)
+	// file server ONLY under /app/
+	fsHandler := apiCfg.middlewareMetricsInc(
+	    http.StripPrefix("/app", http.FileServer(http.Dir(filepathRoot))),
+	)
+	mux.Handle("/app/", fsHandler)
+	mux.Handle("/app", fsHandler)
+
+
+	// API routes
+	mux.HandleFunc("/healthz", handlerReadiness)
+	mux.HandleFunc("/reset", apiCfg.handlerReset)
+	mux.HandleFunc("/metrics", apiCfg.handlerMetrics)
+
+	srv := &http.Server{
+		Addr:    ":" + port,
+		Handler: mux,
+	}
+
+	log.Printf("Serving files from %s on port: %s\n", filepathRoot, port)
+	log.Fatal(srv.ListenAndServe())
 }

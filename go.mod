@@ -1,3 +1,3 @@
-module http_server
+module github.com/bootdotdev/learn-http-servers
 
 go 1.25.1

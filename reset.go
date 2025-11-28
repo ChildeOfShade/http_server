@@ -12,3 +12,13 @@ func (cfg *apiConfig) handlerReset(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusOK)
     w.Write([]byte("OK"))
 }
+
+func (cfg *apiConfig) handlerAdminReset(w http.ResponseWriter, r *http.Request) {
+    if r.Method != http.MethodPost {
+        w.WriteHeader(http.StatusMethodNotAllowed)
+        return
+    }
+
+    cfg.fileserverHits.Store(0)
+    w.WriteHeader(http.StatusOK)
+}

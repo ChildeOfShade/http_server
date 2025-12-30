@@ -26,3 +26,13 @@ Follow these steps to get the server running locally.
 ```bash
 git clone https://github.com/ChildeOfShade/http_server.git
 cd http_server
+```
+## 📖 Usage
+
+After starting the server, you can interact with it using a web browser or `curl`.
+
+### Start the server
+
+```bash
+go run .
+```

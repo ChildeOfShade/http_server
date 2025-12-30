@@ -4,6 +4,17 @@ A simple HTTP server written in Go. This project is designed as a learning exerc
 
 ---
 
+
+## 🤝 Contributing
+
+Contributions are welcome and appreciated!
+
+### Clone the repo
+
+```bash
+git clone https://github.com/ChildeOfShade/http_server.git
+cd http_server
+```
 ## 🚀 Motivation
 
 The motivation behind this project is to practice core backend concepts using Go, including:
